@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "test": "ts-node ./tests.ts"
+  },
   "devDependencies": {
     "@types/node": "^14.0.1",
     "typescript": "^3.9.2"
