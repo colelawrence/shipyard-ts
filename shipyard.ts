@@ -37,8 +37,8 @@ class WorldC {
   }
   view(...storages: Component<any>[]) {
     return new Shiperator([
-      EntityStorage,
-      ...storages.map(storage => this.getStorage(storage as any))
+      ...storages.map(storage => this.getStorage(storage as any)),
+      EntityStorage
     ]);
   }
   add_entity(storages: Component<any>[], components: any[]) {

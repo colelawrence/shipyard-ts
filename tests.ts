@@ -19,7 +19,7 @@ const [health] = world.view(Health).get(e0)!;
 console.log(health);
 
 console.group("both health and fat:");
-for (const [health, stamina] of world.view(Health, Stamina)) {
-  console.log(health, stamina);
+for (const [health, stamina, entityId] of world.view(Health, Stamina)) {
+  console.log(entityId, health, stamina);
 }
 console.groupEnd();

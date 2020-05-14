@@ -79,26 +79,26 @@ export interface IWorld {
     ],
     values: [A, B, C, D, E, F]
   ): EntityId;
-  view<A>(a: Component<A>): Shiperator<[A]>;
-  view<A, B>(a: Component<A>, b: Component<B>): Shiperator<[EntityId, A, B]>;
+  view<A>(a: Component<A>): Shiperator<[A, EntityId]>;
+  view<A, B>(a: Component<A>, b: Component<B>): Shiperator<[A, B, EntityId]>;
   view<A, B, C>(
     a: Component<A>,
     b: Component<B>,
     c: Component<C>
-  ): Shiperator<[EntityId, A, B, C]>;
+  ): Shiperator<[A, B, C, EntityId]>;
   view<A, B, C, D>(
     a: Component<A>,
     b: Component<B>,
     c: Component<C>,
     d: Component<D>
-  ): Shiperator<[EntityId, A, B, C, D]>;
+  ): Shiperator<[A, B, C, D, EntityId]>;
   view<A, B, C, D, E>(
     a: Component<A>,
     b: Component<B>,
     c: Component<C>,
     d: Component<D>,
     e: Component<E>
-  ): Shiperator<[EntityId, A, B, C, D, E]>;
+  ): Shiperator<[A, B, C, D, E, EntityId]>;
   view<A, B, C, D, E, F>(
     a: Component<A>,
     b: Component<B>,
@@ -106,5 +106,5 @@ export interface IWorld {
     d: Component<D>,
     e: Component<E>,
     f: Component<F>
-  ): Shiperator<[EntityId, A, B, C, D, E, F]>;
+  ): Shiperator<[A, B, C, D, E, F, EntityId]>;
 }
