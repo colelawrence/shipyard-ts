@@ -37,8 +37,8 @@ class WorldC {
   }
   view(...storages: Component<any>[]) {
     return new Shiperator([
-      ...storages.map(storage => this.getStorage(storage as any)),
-      EntityStorage
+      ...storages.map((storage) => this.getStorage(storage as any)),
+      EntityStorage,
     ]);
   }
   add_entity(storages: Component<any>[], components: any[]) {
@@ -48,13 +48,13 @@ class WorldC {
     );
     invariant(
       zip(storages, components).filter(
-        ([storage, comp]) => !(comp instanceof storage) // ensure all components are instanceofs their storage
+        ([storage, comp]) => !componentFitsInStorage(comp, storage) // ensure all components are instanceofs their storage
       ).length === 0,
       "all components are instances of storage"
     );
     const entity = new EntityId();
     storages
-      .map(component => this.getStorage(component as any))
+      .map((component) => this.getStorage(component as any))
       .forEach((storage, index) => {
         storage[entity.index()] = components[index];
       });
@@ -71,23 +71,33 @@ class WorldC {
     );
     invariant(
       zip(storages, components).filter(
-        ([storage, comp]) => !(comp instanceof storage) // ensure all components are instanceofs their storage
+        ([storage, comp]) => !componentFitsInStorage(comp, storage) // ensure all components are instanceofs their storage
       ).length === 0,
       "all components are instances of storage"
     );
     storages
-      .map(component => this.getStorage(component as any))
+      .map((component) => this.getStorage(component as any))
       .forEach((storage, index) => {
         storage[entity.index()] = components[index];
       });
   }
 }
 
+function componentFitsInStorage(
+  component: any,
+  storage: Component<any>
+): boolean {
+  return (
+    (typeof storage === "function" && component instanceof storage) ||
+    component.__typename === storage.name
+  );
+}
+
 export const World: { new (): IWorld } = WorldC as any;
 
 function zip<A, B>(a: Iterable<A>, b: Iterable<B>): [A, B][] {
   let bIt = b[Symbol.iterator]();
-  return Array.from(a).map(a => [a, bIt.next().value]);
+  return Array.from(a).map((a) => [a, bIt.next().value]);
 }
 
 export class Shiperator<T extends any[]> {
@@ -97,21 +107,21 @@ export class Shiperator<T extends any[]> {
   }
   iter(): Iterable<T> {
     return this.componentStores
-      .map(storeObj => Object.keys(storeObj))
+      .map((storeObj) => Object.keys(storeObj))
       .sort((left, right) => left.length - right.length)
-      .map(list => new Set(list))
+      .map((list) => new Set(list))
       .reduce((inAll, entityIds) => {
         if (inAll == null) return Array.of(...entityIds); // init
         if (inAll.length === 0) return inAll; // nothing to do
-        return inAll.filter(entityId => entityIds.has(entityId));
+        return inAll.filter((entityId) => entityIds.has(entityId));
       }, null as string[] | null)!
-      .map(entityId =>
-        this.componentStores.map(store => store[entityId])
+      .map((entityId) =>
+        this.componentStores.map((store) => store[entityId])
       ) as any;
   }
   get(id: EntityId): T | undefined {
-    const found = this.componentStores.map(store => store[id.index()]);
-    if (found.filter(a => a != null).length < found.length) return undefined;
+    const found = this.componentStores.map((store) => store[id.index()]);
+    if (found.filter((a) => a != null).length < found.length) return undefined;
     return found as any;
   }
 }
