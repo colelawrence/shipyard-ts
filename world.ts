@@ -177,11 +177,12 @@ export interface IWorld {
   iter(...args: View<any>[]): Shiperator<any[]>;
 }
 
-interface WorkloadBuilder {
+export interface WorkloadBuilder {
   with_system<T extends SystemDeps>(
     deps: T,
     systemFn: (views: SystemFnViews<T>) => any
   ): WorkloadBuilder;
+  with_system<T extends SystemDeps>(system: System<T>): WorkloadBuilder;
   build: () => void;
 }
 
@@ -194,3 +195,16 @@ type SystemFnViews<T extends SystemDeps> = {
     ? View<S>
     : never;
 };
+
+export function system<T extends SystemDeps, R>(
+  /** type signature */
+  views: T,
+  fn: (views: SystemFnViews<T>) => R
+): [T, (views: SystemFnViews<T>) => R] {
+  return [views, fn];
+}
+
+export type System<T extends SystemDeps = SystemDeps, R = any> = [
+  T,
+  (views: SystemFnViews<T>) => R
+];

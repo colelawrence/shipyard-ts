@@ -1,5 +1,5 @@
 import { Component, Storage, Unique, isUniqueOf } from "./types";
-import { IWorld } from "./world";
+import { IWorld, System, WorkloadBuilder } from "./world";
 
 const DEAD: "DEAD" = "DEAD";
 
@@ -75,9 +75,19 @@ class WorldC {
       with_system(
         typeobj: { [name: string]: Component<any> },
         fn: (views: { [name: string]: View<any> }) => any
-      ) {
+      ): WorkloadBuilder {
+        if (arguments.length === 1) {
+          invariant(
+            arguments[0] && arguments[0][0] && arguments[0][1],
+            "expected a system function tuple"
+          );
+
+          // allows passing in both as System type
+          return workloadBuilder.with_system(arguments[0][0], arguments[0][1]);
+        }
         invariant(!built, "workload has already been built");
-        systems.push([typeobj, fn]);
+        systems.push([typeobj, fn!]);
+        // @ts-ignore
         return workloadBuilder;
       },
       build: () => {
