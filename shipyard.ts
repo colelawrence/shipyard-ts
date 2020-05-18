@@ -1,4 +1,4 @@
-import { Component, Storage } from "./types";
+import { Component, Storage, Unique, isUniqueOf } from "./types";
 import { IWorld } from "./world";
 
 const DEAD: "DEAD" = "DEAD";
@@ -47,8 +47,14 @@ export function __get(
   return __iter(...views).get(entityId);
 }
 
+type TypeDepsObj = { [id: string]: Component<any> };
+type SystemFn<R> = (views: { [id: string]: View<any> }) => R;
+
 class WorldC {
   private storages: any = {};
+  private uniques: any = {};
+  private default_workload: string = "";
+  private workloads: { [name: string]: [TypeDepsObj, SystemFn<any>][] } = {};
   private getStorage<T>(component: Component<T>): Storage<T> {
     invariant(
       component.name,
@@ -59,6 +65,48 @@ class WorldC {
     // set object to dictionary mode see https://v8.dev/blog/fast-properties
     delete this.storages[component.name][0];
     return current;
+  }
+
+  add_workload(name: string) {
+    invariant(name, "workload name must be specified");
+    const systems: [TypeDepsObj, SystemFn<any>][] = [];
+    let built = false;
+    const workloadBuilder = {
+      with_system(
+        typeobj: { [name: string]: Component<any> },
+        fn: (views: { [name: string]: View<any> }) => any
+      ) {
+        invariant(!built, "workload has already been built");
+        systems.push([typeobj, fn]);
+        return workloadBuilder;
+      },
+      build: () => {
+        invariant(!built, "workload has already been built");
+        built = true;
+        this.default_workload = this.default_workload || name;
+        this.workloads[name] = systems;
+      },
+    };
+    return workloadBuilder;
+  }
+
+  run_default() {
+    invariant(
+      this.default_workload,
+      "at least one workload must have been built to run the default workload"
+    );
+    this.run_workload(this.default_workload);
+  }
+
+  run_workload(name: string) {
+    invariant(name, "workload name must be specified");
+    invariant(
+      this.workloads[name],
+      `workload with name (${name}) was not defined`
+    );
+    for (const [deps, fn] of this.workloads[name]) {
+      this.run(deps, fn);
+    }
   }
 
   iter(...storages: Component<any>[]) {
@@ -72,6 +120,10 @@ class WorldC {
     return storages
       .map((c) => this.getStorage(c))
       .map((s) => View[PRIV_VIEW](s));
+  }
+  add_unique<T>(component: Component<T>, value: T) {
+    invariant(value, "unique values must always be truthy");
+    this.uniques[component.name] = value;
   }
 
   add_entity(storages: Component<any>[], components: any[]) {
@@ -97,15 +149,25 @@ class WorldC {
       });
   }
   run<R>(
-    typeobj: { [name: string]: Component<any> },
-    fn: (views: { [name: string]: View<any> }) => R
+    typeobj: { [name: string]: Component<any> | Unique<any> },
+    fn: (views: { [name: string]: View<any> | any }) => R
   ): any {
     return fn(
       Object.fromEntries(
-        Object.entries(typeobj).map(([id, component]) => [
-          id,
-          View[PRIV_VIEW](this.getStorage(component)),
-        ])
+        Object.entries(typeobj).map(([id, component]) => {
+          const uniq = isUniqueOf(component);
+          if (uniq) {
+            const uniqValue = this.uniques[uniq.name];
+            invariant(
+              uniqValue,
+              `unique value for "${uniq.name}" has not been added to world`
+            );
+            return [id, uniqValue];
+          } else {
+            // @ts-ignore
+            return [id, View[PRIV_VIEW](this.getStorage(component))];
+          }
+        })
       )
     );
   }

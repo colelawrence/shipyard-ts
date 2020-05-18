@@ -1,5 +1,5 @@
 import { EntityId, Shiperator, View } from "./shipyard";
-import { Component } from "./types";
+import { Component, Unique } from "./types";
 
 export declare function iter<A>(viewA: View<A>): Shiperator<[A, EntityId]>;
 export declare function iter<A, B>(
@@ -80,6 +80,8 @@ export declare function get<A, B, C, D, E, F>(
 export { __get as get } from "./shipyard";
 
 export interface IWorld {
+  add_unique<A>(component: Component<A>, value: A): void;
+
   add_component<A>(
     entity: EntityId,
     storages: [Component<A>],
@@ -158,15 +160,37 @@ export interface IWorld {
     values: [A, B, C, D, E, F]
   ): EntityId;
 
-  run<T extends { [id: string]: Component<any> }, R>(
+  /** The first workload built becomes the default workload */
+  add_workload(name: string): WorkloadBuilder;
+
+  /** Run the first workload built */
+  run_default(): void;
+
+  run_workload(name: string): void;
+
+  run<T extends SystemDeps, R>(
     /** type signature */
     views: T,
-    fn: (args: RunFnArgs<T>) => R
+    fn: (views: SystemFnViews<T>) => R
   ): R;
 
   iter(...args: View<any>[]): Shiperator<any[]>;
 }
 
-type RunFnArgs<T extends { [id: string]: Component<any> }> = {
-  [P in keyof T]: T[P] extends Component<infer S> ? View<S> : never;
+interface WorkloadBuilder {
+  with_system<T extends SystemDeps>(
+    deps: T,
+    systemFn: (views: SystemFnViews<T>) => any
+  ): WorkloadBuilder;
+  build: () => void;
+}
+
+type SystemDeps = { [id: string]: Component<any> | Unique<any> };
+
+type SystemFnViews<T extends SystemDeps> = {
+  [P in keyof T]: T[P] extends Unique<infer S>
+    ? S
+    : T[P] extends Component<infer S>
+    ? View<S>
+    : never;
 };
