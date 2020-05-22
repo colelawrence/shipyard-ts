@@ -1,5 +1,5 @@
 import { Component, Storage, Unique, isUniqueOf } from "./types";
-import { IWorld, System, WorkloadBuilder } from "./world";
+import { IWorld, WorkloadBuilder } from "./world";
 
 const DEAD: "DEAD" = "DEAD";
 
