@@ -36,7 +36,7 @@ export declare function iterComponents<A, B, C, D, E, F>(
 ): Shiperator<[A, B, C, D, E, F, EntityId]>;
 
 // @ts-ignore
-export { iterComponents } from "./shipyard";
+export { _iterComponents as iterComponents } from "./shipyard";
 
 export declare function getComponent<A>(
   entityId: EntityId,
@@ -79,7 +79,7 @@ export declare function getComponent<A, B, C, D, E, F>(
 ): [A, B, C, D, E, F, EntityId] | undefined;
 
 // @ts-ignore
-export { getComponent } from "./shipyard";
+export { _getComponent as getComponent } from "./shipyard";
 
 export interface IWorld {
   add_unique<A>(component: Component<A>, value: A): void;

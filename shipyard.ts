@@ -35,16 +35,16 @@ export class View<T> {
 }
 
 /** implementation of iter */
-export function iterComponents(...views: View<any>[]): Shiperator<any[]> {
+export function _iterComponents(...views: View<any>[]): Shiperator<any[]> {
   return new Shiperator([...views.map((v) => v["storage"]), EntityStorage]);
 }
 
 /** implementation of get */
-export function getComponent(
+export function _getComponent(
   entityId: EntityId,
   ...views: View<any>[]
 ): any[] | undefined {
-  return iterComponents(...views).get(entityId);
+  return _iterComponents(...views).get(entityId);
 }
 
 type TypeDepsObj = { [id: string]: Component<any> };
