@@ -35,16 +35,16 @@ export class View<T> {
 }
 
 /** implementation of iter */
-export function __iter(...views: View<any>[]): Shiperator<any[]> {
+export function iterComponents(...views: View<any>[]): Shiperator<any[]> {
   return new Shiperator([...views.map((v) => v["storage"]), EntityStorage]);
 }
 
 /** implementation of get */
-export function __get(
+export function getComponent(
   entityId: EntityId,
   ...views: View<any>[]
 ): any[] | undefined {
-  return __iter(...views).get(entityId);
+  return iterComponents(...views).get(entityId);
 }
 
 type TypeDepsObj = { [id: string]: Component<any> };
@@ -219,7 +219,6 @@ export class Shiperator<T extends any[]> {
   iter(): Iterable<T> {
     return this.componentStores
       .map((storeObj) => Object.keys(storeObj))
-      .sort((left, right) => left.length - right.length)
       .map((list) => new Set(list))
       .reduce((inAll, entityIds) => {
         if (inAll == null) return Array.of(...entityIds); // init

@@ -1,30 +1,32 @@
 import { EntityId, Shiperator, View } from "./shipyard";
 import { Component, Unique } from "./types";
 
-export declare function iter<A>(viewA: View<A>): Shiperator<[A, EntityId]>;
-export declare function iter<A, B>(
+export declare function iterComponents<A>(
+  viewA: View<A>
+): Shiperator<[A, EntityId]>;
+export declare function iterComponents<A, B>(
   viewA: View<A>,
   viewB: View<B>
 ): Shiperator<[A, B, EntityId]>;
-export declare function iter<A, B, C>(
+export declare function iterComponents<A, B, C>(
   viewA: View<A>,
   viewB: View<B>,
   viewC: View<C>
 ): Shiperator<[A, B, C, EntityId]>;
-export declare function iter<A, B, C, D>(
+export declare function iterComponents<A, B, C, D>(
   viewA: View<A>,
   viewB: View<B>,
   viewC: View<C>,
   viewD: View<D>
 ): Shiperator<[A, B, C, D, EntityId]>;
-export declare function iter<A, B, C, D, E>(
+export declare function iterComponents<A, B, C, D, E>(
   viewA: View<A>,
   viewB: View<B>,
   viewC: View<C>,
   viewD: View<D>,
   viewE: View<E>
 ): Shiperator<[A, B, C, D, E, EntityId]>;
-export declare function iter<A, B, C, D, E, F>(
+export declare function iterComponents<A, B, C, D, E, F>(
   viewA: View<A>,
   viewB: View<B>,
   viewC: View<C>,
@@ -34,31 +36,31 @@ export declare function iter<A, B, C, D, E, F>(
 ): Shiperator<[A, B, C, D, E, F, EntityId]>;
 
 // @ts-ignore
-export { __iter as iter } from "./shipyard";
+export { iterComponents } from "./shipyard";
 
-export declare function get<A>(
+export declare function getComponent<A>(
   entityId: EntityId,
   viewA: View<A>
 ): [A, EntityId] | undefined;
-export declare function get<A, B>(
+export declare function getComponent<A, B>(
   entityId: EntityId,
   viewA: View<A>,
   viewB: View<B>
 ): [A, B, EntityId] | undefined;
-export declare function get<A, B, C>(
+export declare function getComponent<A, B, C>(
   entityId: EntityId,
   viewA: View<A>,
   viewB: View<B>,
   viewC: View<C>
 ): [A, B, C, EntityId] | undefined;
-export declare function get<A, B, C, D>(
+export declare function getComponent<A, B, C, D>(
   entityId: EntityId,
   viewA: View<A>,
   viewB: View<B>,
   viewC: View<C>,
   viewD: View<D>
 ): [A, B, C, D, EntityId] | undefined;
-export declare function get<A, B, C, D, E>(
+export declare function getComponent<A, B, C, D, E>(
   entityId: EntityId,
   viewA: View<A>,
   viewB: View<B>,
@@ -66,7 +68,7 @@ export declare function get<A, B, C, D, E>(
   viewD: View<D>,
   viewE: View<E>
 ): [A, B, C, D, E, EntityId] | undefined;
-export declare function get<A, B, C, D, E, F>(
+export declare function getComponent<A, B, C, D, E, F>(
   entityId: EntityId,
   viewA: View<A>,
   viewB: View<B>,
@@ -77,7 +79,7 @@ export declare function get<A, B, C, D, E, F>(
 ): [A, B, C, D, E, F, EntityId] | undefined;
 
 // @ts-ignore
-export { __get as get } from "./shipyard";
+export { getComponent } from "./shipyard";
 
 export interface IWorld {
   add_unique<A>(component: Component<A>, value: A): void;
